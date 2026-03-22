@@ -1,0 +1,16 @@
+# Experiment results (generated data, not source)
+results/
+
+# Kubernetes temp files
+/tmp/port-forward.log
+/tmp/redis-portforward.pid
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
