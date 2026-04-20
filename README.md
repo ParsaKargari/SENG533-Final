@@ -15,6 +15,7 @@ Install the following on your host machine before running anything:
 | redis-benchmark | 7.x | Ships with Redis client tools |
 | redis-cli | 7.x | Used for validation pings |
 | Python 3 | 3.9+ | For analysis script only |
+| Tilt | 0.33+ | Optional — for Tilt-based workflow |
 
 ---
 
@@ -157,6 +158,56 @@ To preview without executing:
 #### Step 8 — Analyze results
 ```bash
 python3 analysis/analyze_results.py
+```
+
+---
+
+## Quick Start with Tilt (Recommended)
+
+Tilt provides a live dashboard UI at `http://localhost:10350` and manages pod deployment and port-forwarding automatically.
+
+### Install Tilt
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
+```
+
+### First-time setup
+
+```bash
+bash scripts/setup.sh    # start Minikube, enable metrics-server, apply service, create results dirs
+tilt up                  # starts Tilt UI with default CPU limit of 0.5
+```
+
+For subsequent sessions where Minikube has stopped, click **minikube-setup → Run** in the Tilt dashboard to re-run `setup.sh` (it safely skips `minikube start` if already running).
+
+### Switching CPU configurations
+
+```bash
+# While Tilt is running, switch the active CPU limit:
+tilt args -- --cpu=0.25    # 0.25-core limit
+tilt args -- --cpu=0.5     # 0.5-core limit (default)
+tilt args -- --cpu=1.0     # 1.0-core limit
+```
+
+Tilt automatically re-deploys Redis and re-establishes port-forwarding. No manual `kubectl` commands needed.
+
+### Running experiments via the Tilt UI
+
+| Button | What it does |
+|--------|-------------|
+| **Run GET (50 clients)** | Quick GET benchmark at the current CPU limit |
+| **Run SET (50 clients)** | Quick SET benchmark at the current CPU limit |
+| **Run ALL 30 experiments** | Full experiment suite across all 30 configs (~2–3 hrs) |
+| **Analyze → summary.csv** | Aggregate raw results into `analysis/summary.csv` |
+
+All benchmark output streams live in the Tilt UI log pane.
+
+### Teardown
+
+```bash
+tilt down        # removes Kubernetes resources; leaves Minikube running
+minikube stop    # optional: stop Minikube entirely
 ```
 
 ---
